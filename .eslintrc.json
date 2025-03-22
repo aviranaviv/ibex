@@ -1,0 +1,69 @@
+
+{
+  "$schema": "https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/eslintrc.json",
+  "extends": ["plugin:@typescript-eslint/recommended"],
+  "parser": "@typescript-eslint/parser",
+  "env": {
+    "browser": true,
+    "es6": true,
+    "node": true
+  },
+  "plugins": [
+    "@typescript-eslint",
+    "no-only-tests",
+    "chai-friendly",
+    "filenames",
+    "import",
+    "mocha",
+    "simple-import-sort"
+  ],
+  "rules": {
+    "linebreak-style": 0,
+    "max-len": "off",
+    "comma-dangle": "off",
+    "no-unused-expressions": "off",
+    "no-underscore-dangle": ["error", { "allow": ["_payload"] }],
+    "spaced-comment": ["error", "always", { "markers": ["/ <reference", "//"] }],
+    "lines-between-class-members": ["error", "always", { "exceptAfterSingleLine": true }],
+    "class-methods-use-this": ["error", { "enforceForClassFields": false }],
+    "chai-friendly/no-unused-expressions": "error",
+    "no-plusplus": ["error", {"allowForLoopAfterthoughts": true}],
+    "mocha/no-mocha-arrows": "off",
+    "mocha/no-exclusive-tests": "error",
+    "mocha/no-skipped-tests": "warn",
+    "mocha/no-hooks-for-single-case": "off",
+    "mocha/no-top-level-hooks": "off",
+    "mocha/no-setup-in-describe": "off",
+    "filenames/match-regex": ["error", "^[a-z0-9-.]+$"],
+    "no-console": "off",
+    "prefer-regex-literals": "off",
+    "import/no-commonjs":"error",
+    "import/no-useless-path-segments": ["error", { "noUselessIndex": true }],
+    "simple-import-sort/imports": "error",
+    "simple-import-sort/exports": "error",
+    "tags-validator/must-match": "off",
+    "tags-validator/top-level": "off",
+    "@typescript-eslint/comma-dangle": ["error", "never"],
+    "@typescript-eslint/indent": ["error", 4],
+    "indent": "off",
+    "import/extensions": "off",
+    "no-param-reassign": "off",  // Want to potentially re-enable this.
+    "no-await-in-loop": "off",  // Want to potentially re-enable this.
+    "import/no-unresolved": "off", // Want to potentially re-enable this.
+    "no-useless-constructor": "off", // Want to potentially re-enable this.
+    "consistent-return": "off",  // Want to potentially re-enable this.
+    "import/prefer-default-export": "off",  // Want to potentially re-enable this.
+    "no-use-before-define": "off",  // Want to potentially re-enable this.
+    "@typescript-eslint/no-use-before-define": "off",  // Want to potentially re-enable this.
+    "@typescript-eslint/default-paramdefault-param-last-last": "off",  // Want to potentially re-enable this.
+    "@typescript-eslint/no-explicit-any": ["off"],
+    "@typescript-eslint/semi": ["error", "always"],
+    "@typescript-eslint/quotes": ["error", "single",
+      {
+        "avoidEscape": true,
+        "allowTemplateLiterals": true
+      }
+    ]
+  },
+  "ignorePatterns": ["results/*", "playwright-report/*", "test-results/*"]
+}
