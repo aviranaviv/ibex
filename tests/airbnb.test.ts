@@ -61,7 +61,7 @@ test.describe('Airbnb', () => {
         await rooms.guestsPicker.click();
         await rooms.decreaseAmountChildrenGuests(childrenAmount);
 
-        const newTotalGuests = totalGuests - childrenAmount;
+        const newTotalGuests: number = totalGuests - childrenAmount;
         await expect(rooms.guestsPicker).toHaveText(`${newTotalGuests} guests`);
 
         checkInDate = dayjs(checkInDate).format('MM/DD/YYYY');

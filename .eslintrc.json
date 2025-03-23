@@ -47,15 +47,15 @@
     "@typescript-eslint/indent": ["error", 4],
     "indent": "off",
     "import/extensions": "off",
-    "no-param-reassign": "off",  // Want to potentially re-enable this.
-    "no-await-in-loop": "off",  // Want to potentially re-enable this.
-    "import/no-unresolved": "off", // Want to potentially re-enable this.
-    "no-useless-constructor": "off", // Want to potentially re-enable this.
-    "consistent-return": "off",  // Want to potentially re-enable this.
-    "import/prefer-default-export": "off",  // Want to potentially re-enable this.
-    "no-use-before-define": "off",  // Want to potentially re-enable this.
-    "@typescript-eslint/no-use-before-define": "off",  // Want to potentially re-enable this.
-    "@typescript-eslint/default-paramdefault-param-last-last": "off",  // Want to potentially re-enable this.
+    "no-param-reassign": "off",
+    "no-await-in-loop": "off",
+    "import/no-unresolved": "off",
+    "no-useless-constructor": "off",
+    "consistent-return": "off",
+    "import/prefer-default-export": "off",
+    "no-use-before-define": "off",
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/default-paramdefault-param-last-last": "off",
     "@typescript-eslint/no-explicit-any": ["off"],
     "@typescript-eslint/semi": ["error", "always"],
     "@typescript-eslint/quotes": ["error", "single",
