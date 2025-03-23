@@ -1,5 +1,5 @@
 import { expect, Page, test } from '@playwright/test';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 import HomePage from '@/page-objects/home-page';
 import Rooms from '@/page-objects/rooms';
@@ -12,11 +12,14 @@ let searchResults: SearchResult;
 let rooms: Rooms;
 
 const expectedDestinations = 'Amsterdam';
-const dateFormat: string = 'YYYY-MM-DD';
-const currentDate: string = dayjs().format(dateFormat);
-const tomorrowDate: string = dayjs().add(1, 'day').format(dateFormat);
+const currentDate: Dayjs = dayjs();
+const nextWeekCheckOutDate: string = dayjs(currentDate).add(1, 'day').format('MM/DD/YYYY');
+
 const adultsAmount: number = 2;
 const childrenAmount: number = 1;
+
+let checkInDate: string = currentDate.format('YYYY-MM-DD');
+let checkOutDate: string = dayjs(currentDate).add(1, 'day').format('YYYY-MM-DD');
 
 test.describe('Airbnb', () => {
     test.beforeEach(async ({ page }) => {
@@ -27,12 +30,13 @@ test.describe('Airbnb', () => {
 
     test('Airbnb booking flow validation', async ({ context }) => {
         await homePage.openHomePage();
+
         await searchBar.searchAndSelectDestination(expectedDestinations);
-        await searchBar.selectCheckInAndCheckOutDates(currentDate, tomorrowDate);
+        await searchBar.selectCheckInAndCheckOutDates(checkInDate, checkOutDate);
         await searchBar.setAdultsAndChildrenGuests(adultsAmount, childrenAmount);
         await searchBar.clickOnSearchButton();
 
-        const expectedSelectedDate = `${dayjs(currentDate).format('MMM D')} – ${dayjs(tomorrowDate).format('D')}`;
+        const expectedSelectedDate = `${dayjs(checkInDate).format('MMM D')} – ${dayjs(checkOutDate).format('D')}`;
         const totalGuests = adultsAmount + childrenAmount;
 
         await expect(searchBar.searchLocationButton).toHaveText(expectedDestinations);
@@ -45,22 +49,20 @@ test.describe('Airbnb', () => {
         await roomsPage.waitForLoadState();
         rooms = new Rooms(roomsPage);
 
-        const newCurrentDateFormat: string = dayjs(currentDate).format('M/DD/YYYY');
-        const newTomorrowDateFormat: string = dayjs(tomorrowDate).format('M/DD/YYYY');
-
         await rooms.closeTranslationOnPopup();
 
-        await expect(rooms.checkInDate).toHaveText(newCurrentDateFormat);
-        await expect(rooms.checkOutDate).toHaveText(newTomorrowDateFormat);
+        checkInDate = dayjs(currentDate).format('M/DD/YYYY');
+        checkOutDate = dayjs(checkOutDate).format('M/DD/YYYY');
+
+        await expect(rooms.checkInDate).toHaveText(checkInDate);
+        await expect(rooms.checkOutDate).toHaveText(checkOutDate);
         await expect(rooms.guestsPicker).toHaveText(`${totalGuests} guests`);
 
         await rooms.guestsPicker.click();
         await rooms.decreaseAmountChildrenGuests(childrenAmount);
         await expect(rooms.guestsPicker).toHaveText(`${totalGuests - childrenAmount} guests`);
 
-        const nextWeekDate = dayjs().add(1, 'week').format('MM/DD/YYYY');
-        const currentDateNewFormat = dayjs(currentDate).format('MM/DD/YYYY');
-
-        await rooms.setNewDatesIfNotBlocked(currentDateNewFormat, nextWeekDate);
+        checkInDate = dayjs(checkInDate).format('MM/DD/YYYY');
+        await rooms.setNewDatesIfNotBlocked(checkInDate, nextWeekCheckOutDate);
     });
 });
