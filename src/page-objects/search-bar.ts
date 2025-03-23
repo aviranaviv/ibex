@@ -7,63 +7,105 @@ export default class SearchBar extends PageObjects {
         super(page);
     }
 
+    // Locators
     readonly searchDestinationsInput: Locator = this.page.getByTestId('structured-search-input-field-query');
-    readonly searchListContainer: Locator = this.page.getByTestId('structured-search-input-field-query-panel');
     readonly firstSuggestionsOption: Locator = this.page.getByTestId('option-0');
+
     readonly checkInTab: Locator = this.page.getByTestId('structured-search-input-field-split-dates-0');
     readonly checkOutTab: Locator = this.page.getByTestId('structured-search-input-field-split-dates-1');
-    readonly getDate: (date: string) => Locator = (date: string): Locator =>  this.page.locator(`[data-state--date-string="${date}"]`);
+    readonly getSpecificDate = (date: string): Locator => this.page.locator(`[data-state--date-string="${date}"]`);
+
     readonly addGuestsButton: Locator = this.page.getByTestId('structured-search-input-field-guests-button');
     readonly increaseAdultsGuestsButton: Locator = this.page.getByTestId('stepper-adults-increase-button');
     readonly increaseChildrenGuestsButton: Locator = this.page.getByTestId('stepper-children-increase-button');
-    readonly addGuestsPanel: Locator = this.page.getByTestId('structured-search-input-field-guests-panel');
+
     readonly searchButton: Locator = this.page.getByTestId('structured-search-input-search-button');
     readonly searchLocationButton: Locator = this.page.getByTestId('little-search-location').locator('div');
     readonly searchAnyTimeButton: Locator = this.page.getByTestId('little-search-anytime').locator('div');
     readonly searchGuestsButton: Locator = this.page.getByTestId('little-search-guests').locator('div').nth(0);
 
-    async searchAndSelectDestinations(name: string): Promise<void> {
+    /**
+     * Searches and selects the first suggested destination.
+     * @param {string} name - Destination name to search.
+     * @returns {Promise<void>}
+     */
+    async searchAndSelectDestination(name: string): Promise<void> {
         await this.searchDestinationsInput.fill(name);
-        await this.searchListContainer.isVisible();
         await this.firstSuggestionsOption.click();
     }
 
-    async setCheckInDate(checkInDate: string) {
+    /**
+     * Selects a check-in date.
+     * @param {string} checkInDate - Date in YYYY-MM-DD format.
+     * @returns {Promise<void>}
+     */
+    async setCheckInDate(checkInDate: string): Promise<void> {
         await expect(this.checkInTab).toHaveAttribute('aria-expanded', 'true');
-        await this.getDate(checkInDate).click();
+        await this.getSpecificDate(checkInDate).click();
     }
 
-    async setCheckOutDate(checkOutDate: string) {
+    /**
+     * Selects a check-out date.
+     * @param {string} checkOutDate - Date in YYYY-MM-DD format.
+     * @returns {Promise<void>}
+     */
+    async setCheckOutDate(checkOutDate: string): Promise<void> {
         await expect(this.checkOutTab).toHaveAttribute('aria-expanded', 'true');
-        await this.getDate(checkOutDate).click();
+        await this.getSpecificDate(checkOutDate).click();
     }
 
-    async selectCheckInAndCheckOutDates(checkInDate: string, checkOutDate: string): Promise<void>{
+    /**
+     * Sets both check-in and check-out dates.
+     * @param {string} checkInDate - Check-in date in YYYY-MM-DD format.
+     * @param {string} checkOutDate - Check-out date in YYYY-MM-DD format.
+     * @returns {Promise<void>}
+     */
+    async selectCheckInAndCheckOutDates(checkInDate: string, checkOutDate: string): Promise<void> {
         await this.setCheckInDate(checkInDate);
         await this.setCheckOutDate(checkOutDate);
     }
 
-    async increaseAmountOfAdultsGuests(amount: number){
-        for (let i: number = 0; i < amount; i++) {
+    /**
+     * Increases the number of adult guests.
+     * @param {number} amount - Number of times to increase.
+     * @returns {Promise<void>}
+     */
+    async increaseAdultsGuests(amount: number): Promise<void> {
+        for (let i = 0; i < amount; i++) {
             await this.increaseAdultsGuestsButton.click();
         }
     }
 
-    async increaseAmountOfChildrenGuests(amount: number){
-        for (let i: number = 0; i < amount; i++) {
+    /**
+     * Increases the number of children guests.
+     * @param {number} amount - Number of times to increase.
+     * @returns {Promise<void>}
+     */
+    async increaseChildrenGuests(amount: number): Promise<void> {
+        for (let i = 0; i < amount; i++) {
             await this.increaseChildrenGuestsButton.click();
         }
     }
 
-    async setAdultsAndChildrenGuests(adultsAmount: number, childrenAmount: number){
+    /**
+     * Sets the number of adult and child guests.
+     * @param {number} adults - Number of adult guests.
+     * @param {number} children - Number of child guests.
+     * @returns {Promise<void>}
+     */
+    async setAdultsAndChildrenGuests(adults: number, children: number): Promise<void> {
         await this.addGuestsButton.click();
         await expect(this.addGuestsButton).toHaveAttribute('aria-expanded', 'true');
-        await this.addGuestsPanel.isVisible();
-        await this.increaseAmountOfAdultsGuests(adultsAmount);
-        await this.increaseAmountOfChildrenGuests(childrenAmount);
+
+        await this.increaseAdultsGuests(adults);
+        await this.increaseChildrenGuests(children);
     }
 
-    async clickOnSearchButton() {
+    /**
+     * Clicks on the search button.
+     * @returns {Promise<void>}
+     */
+    async clickOnSearchButton(): Promise<void> {
         await this.searchButton.click();
     }
 }

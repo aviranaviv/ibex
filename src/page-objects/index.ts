@@ -1,4 +1,4 @@
-import { Locator, type Page } from '@playwright/test';
+import { type Page } from '@playwright/test';
 
 export default class PageObjects {
     /**
@@ -6,7 +6,7 @@ export default class PageObjects {
      * @param {Page} page - page element.
      */
     protected page: Page;
-    constructor(page) {
+    constructor(page: Page) {
         this.page = page;
     }
 }

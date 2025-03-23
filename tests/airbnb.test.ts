@@ -25,9 +25,9 @@ test.describe('Airbnb', () => {
         searchResults = new SearchResult(page);
     });
 
-    test('Airbnb booking flow validation', async ({ page, context }) => {
+    test('Airbnb booking flow validation', async ({ context }) => {
         await homePage.openHomePage();
-        await searchBar.searchAndSelectDestinations(expectedDestinations);
+        await searchBar.searchAndSelectDestination(expectedDestinations);
         await searchBar.selectCheckInAndCheckOutDates(currentDate, tomorrowDate);
         await searchBar.setAdultsAndChildrenGuests(adultsAmount, childrenAmount);
         await searchBar.clickOnSearchButton();
@@ -42,6 +42,7 @@ test.describe('Airbnb', () => {
         const newPagePromise = context.waitForEvent('page');
         await searchResults.selectHighestRatedListing();
         const roomsPage: Page = await newPagePromise;
+        await roomsPage.waitForLoadState();
         rooms = new Rooms(roomsPage);
 
         const newCurrentDateFormat: string = dayjs(currentDate).format('M/DD/YYYY');
@@ -61,6 +62,5 @@ test.describe('Airbnb', () => {
         const currentDateNewFormat = dayjs(currentDate).format('MM/DD/YYYY');
 
         await rooms.setNewDatesIfNotBlocked(currentDateNewFormat, nextWeekDate);
-        await roomsPage.pause();
     });
 });
