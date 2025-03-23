@@ -8,30 +8,39 @@ export default class SearchResult extends PageObjects {
         super(page);
     }
 
-    readonly getCardByRated = (rated: number) => this.page.getByText(`${rated} out of 5`);
+    /**
+     * Gets a card element based on the provided rating.
+     * @param {number} rated - The rating to search for.
+     * @returns {Locator} The locator for the matching rating element.
+     */
+    readonly getCardByRated = (rated: number): Locator => this.page.getByText(`${rated} out of 5`);
 
+    /**
+     * Retrieves all ratings displayed on the search results page.
+     * @returns {Promise<string[]>} A promise that resolves with an array of rating values as strings.
+     */
     async getRatingMap(): Promise<string[]> {
-        await this.page.waitForLoadState('domcontentloaded');
-        await this.page.waitForLoadState('load');
+        await this.page.waitForTimeout(1000);
+        const ratingElements: Locator[] = await this.page.getByText('out of 5').all();
 
-        const allResultsRating: Locator[] = await this.page.getByText('out of 5').all();
-        const allResultsRatingText: string[] = [];
-        for (const el of allResultsRating) {
-            const resultText: string = await el.innerText();
-            const extractRating: string = resultText.split(' ')[0];
-            allResultsRatingText.push(extractRating);
-        }
+        return Promise.all(
+            ratingElements.map(async (el: Locator): Promise<string> => (await el.innerText()).split(' ')[0])
+        );
+    }
 
-        return allResultsRatingText;
-    };
-
+    /**
+     * Selects the listing with the highest rating and clicks on it.
+     * @returns {Promise<void>} A promise that resolves when the action is completed.
+     */
     async selectHighestRatedListing(): Promise<void> {
-        const ratingList: string[] = await this.getRatingMap();
-        const highestRated: number = Math.max(...ratingList.map(Number));
-        console.log(`The highest rated is ${highestRated}`);
-        await this.page.waitForTimeout(2 * 1000);
-        await this.getCardByRated(highestRated).first().scrollIntoViewIfNeeded();
-        await this.getCardByRated(highestRated).first().waitFor({ state: 'visible' });
-        await this.getCardByRated(highestRated).first().click({ force: true });
+        const ratings: string[] = await this.getRatingMap();
+        const highestRating: number = Math.max(...ratings.map(Number));
+        console.log(`Highest rated listing: ${highestRating}`);
+
+        const highestRatedCard = this.getCardByRated(highestRating).first();
+
+        await highestRatedCard.scrollIntoViewIfNeeded();
+        await highestRatedCard.waitFor({ state: 'visible' });
+        await highestRatedCard.click({ force: true });
     }
 }

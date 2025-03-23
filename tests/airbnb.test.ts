@@ -13,7 +13,7 @@ let rooms: Rooms;
 
 const expectedDestinations = 'Amsterdam';
 const currentDate: Dayjs = dayjs();
-const nextWeekCheckOutDate: string = dayjs(currentDate).add(1, 'day').format('MM/DD/YYYY');
+const nextWeekCheckOutDate: string = dayjs(currentDate).add(1, 'week').format('MM/DD/YYYY');
 
 const adultsAmount: number = 2;
 const childrenAmount: number = 1;
@@ -60,9 +60,15 @@ test.describe('Airbnb', () => {
 
         await rooms.guestsPicker.click();
         await rooms.decreaseAmountChildrenGuests(childrenAmount);
-        await expect(rooms.guestsPicker).toHaveText(`${totalGuests - childrenAmount} guests`);
+
+        const newTotalGuests = totalGuests - childrenAmount;
+        await expect(rooms.guestsPicker).toHaveText(`${newTotalGuests} guests`);
 
         checkInDate = dayjs(checkInDate).format('MM/DD/YYYY');
         await rooms.setNewDatesIfNotBlocked(checkInDate, nextWeekCheckOutDate);
+
+        await rooms.reserveButton.click();
+        await roomsPage.waitForURL(/\/book/);
+        expect(roomsPage.url()).toContain(`numberOfGuests=${newTotalGuests}`);
     });
 });

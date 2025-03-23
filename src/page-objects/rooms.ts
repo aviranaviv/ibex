@@ -17,6 +17,8 @@ export default class Rooms extends PageObjects {
     readonly guestsPicker: Locator = this.page.locator('#GuestPicker-book_it-trigger');
     readonly decreaseChildrenGuestsButton: Locator = this.page.getByTestId('GuestPicker-book_it-form-children-stepper-decrease-button');
 
+    readonly reserveButton =  this.page.getByRole('button', { name: 'Reserve' });
+
     /**
      * Closes the translation popup if it appears.
      * If the popup is not found, it proceeds with execution.

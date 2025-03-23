@@ -13,7 +13,6 @@ export default class SearchBar extends PageObjects {
 
     readonly checkInTab: Locator = this.page.getByTestId('structured-search-input-field-split-dates-0');
     readonly checkOutTab: Locator = this.page.getByTestId('structured-search-input-field-split-dates-1');
-    readonly getSpecificDate = (date: string): Locator => this.page.locator(`[data-state--date-string="${date}"]`);
 
     readonly addGuestsButton: Locator = this.page.getByTestId('structured-search-input-field-guests-button');
     readonly increaseAdultsGuestsButton: Locator = this.page.getByTestId('stepper-adults-increase-button');
@@ -23,6 +22,13 @@ export default class SearchBar extends PageObjects {
     readonly searchLocationButton: Locator = this.page.getByTestId('little-search-location').locator('div');
     readonly searchAnyTimeButton: Locator = this.page.getByTestId('little-search-anytime').locator('div');
     readonly searchGuestsButton: Locator = this.page.getByTestId('little-search-guests').locator('div').nth(0);
+
+    /**
+     * Gets a specific date element based on the provided date string.
+     * @param {string} date - The date to locate in the format expected by the data attribute.
+     * @returns {Locator} The locator for the matching date element.
+     */
+    readonly getSpecificDate = (date: string): Locator => this.page.locator(`[data-state--date-string="${date}"]`);
 
     /**
      * Searches and selects the first suggested destination.
@@ -36,7 +42,7 @@ export default class SearchBar extends PageObjects {
 
     /**
      * Selects a check-in date.
-     * @param {string} checkInDate - Date in YYYY-MM-DD format.
+     * @param {string} checkInDate - Check-in date.
      * @returns {Promise<void>}
      */
     async setCheckInDate(checkInDate: string): Promise<void> {
@@ -46,7 +52,7 @@ export default class SearchBar extends PageObjects {
 
     /**
      * Selects a check-out date.
-     * @param {string} checkOutDate - Date in YYYY-MM-DD format.
+     * @param {string} checkOutDate - Check-out date.
      * @returns {Promise<void>}
      */
     async setCheckOutDate(checkOutDate: string): Promise<void> {
@@ -56,8 +62,8 @@ export default class SearchBar extends PageObjects {
 
     /**
      * Sets both check-in and check-out dates.
-     * @param {string} checkInDate - Check-in date in YYYY-MM-DD format.
-     * @param {string} checkOutDate - Check-out date in YYYY-MM-DD format.
+     * @param {string} checkInDate - Check-in date.
+     * @param {string} checkOutDate - Check-out date.
      * @returns {Promise<void>}
      */
     async selectCheckInAndCheckOutDates(checkInDate: string, checkOutDate: string): Promise<void> {
