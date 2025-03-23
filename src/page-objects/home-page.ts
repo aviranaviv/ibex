@@ -2,7 +2,7 @@ import { Page } from '@playwright/test';
 
 import PageObjects from '@/page-objects/index';
 
-export default class AirbnbHomePage extends PageObjects {
+export default class HomePage extends PageObjects {
     constructor(page: Page) {
         super(page);
     }

@@ -43,13 +43,13 @@ export default class SearchBar extends PageObjects {
         await this.setCheckOutDate(checkOutDate);
     }
 
-    async setAmountOfAdultsGuests(amount: number){
+    async increaseAmountOfAdultsGuests(amount: number){
         for (let i: number = 0; i < amount; i++) {
             await this.increaseAdultsGuestsButton.click();
         }
     }
 
-    async setAmountOfChildrenGuests(amount: number){
+    async increaseAmountOfChildrenGuests(amount: number){
         for (let i: number = 0; i < amount; i++) {
             await this.increaseChildrenGuestsButton.click();
         }
@@ -59,8 +59,8 @@ export default class SearchBar extends PageObjects {
         await this.addGuestsButton.click();
         await expect(this.addGuestsButton).toHaveAttribute('aria-expanded', 'true');
         await this.addGuestsPanel.isVisible();
-        await this.setAmountOfAdultsGuests(adultsAmount);
-        await this.setAmountOfChildrenGuests(childrenAmount);
+        await this.increaseAmountOfAdultsGuests(adultsAmount);
+        await this.increaseAmountOfChildrenGuests(childrenAmount);
     }
 
     async clickOnSearchButton() {

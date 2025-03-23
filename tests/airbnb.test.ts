@@ -1,13 +1,15 @@
-import { expect, test } from '@playwright/test';
+import { expect, Page, test } from '@playwright/test';
 import dayjs from 'dayjs';
 
-import AirbnbHomePage from '@/page-objects/airbnb-home-page';
+import HomePage from '@/page-objects/home-page';
+import Rooms from '@/page-objects/rooms';
 import SearchBar from '@/page-objects/search-bar';
 import SearchResult from '@/page-objects/search-result';
 
-let homePage: AirbnbHomePage;
+let homePage: HomePage;
 let searchBar: SearchBar;
 let searchResults: SearchResult;
+let rooms: Rooms;
 
 const expectedDestinations = 'Amsterdam';
 const dateFormat: string = 'YYYY-MM-DD';
@@ -18,12 +20,12 @@ const childrenAmount: number = 1;
 
 test.describe('Airbnb', () => {
     test.beforeEach(async ({ page }) => {
-        homePage = new AirbnbHomePage(page);
+        homePage = new HomePage(page);
         searchBar = new SearchBar(page);
         searchResults = new SearchResult(page);
     });
 
-    test('Airbnb booking flow validation', async ({ page }) => {
+    test('Airbnb booking flow validation', async ({ page, context }) => {
         await homePage.openHomePage();
         await searchBar.searchAndSelectDestinations(expectedDestinations);
         await searchBar.selectCheckInAndCheckOutDates(currentDate, tomorrowDate);
@@ -37,7 +39,28 @@ test.describe('Airbnb', () => {
         await expect(searchBar.searchAnyTimeButton).toHaveText(expectedSelectedDate);
         await expect(searchBar.searchGuestsButton).toHaveText(`${totalGuests} guests`);
 
-        await page.pause();
-        await searchResults.getRatingMap();
+        const newPagePromise = context.waitForEvent('page');
+        await searchResults.selectHighestRatedListing();
+        const roomsPage: Page = await newPagePromise;
+        rooms = new Rooms(roomsPage);
+
+        const newCurrentDateFormat: string = dayjs(currentDate).format('M/DD/YYYY');
+        const newTomorrowDateFormat: string = dayjs(tomorrowDate).format('M/DD/YYYY');
+
+        await rooms.closeTranslationOnPopup();
+
+        await expect(rooms.checkInDate).toHaveText(newCurrentDateFormat);
+        await expect(rooms.checkOutDate).toHaveText(newTomorrowDateFormat);
+        await expect(rooms.guestsPicker).toHaveText(`${totalGuests} guests`);
+
+        await rooms.guestsPicker.click();
+        await rooms.decreaseAmountChildrenGuests(childrenAmount);
+        await expect(rooms.guestsPicker).toHaveText(`${totalGuests - childrenAmount} guests`);
+
+        const nextWeekDate = dayjs().add(1, 'week').format('MM/DD/YYYY');
+        const currentDateNewFormat = dayjs(currentDate).format('MM/DD/YYYY');
+
+        await rooms.setNewDatesIfNotBlocked(currentDateNewFormat, nextWeekDate);
+        await roomsPage.pause();
     });
 });
