@@ -27,6 +27,7 @@ export default class Rooms extends PageObjects {
      */
     async closeTranslationOnPopup(): Promise<void> {
         try {
+            await this.page.waitForTimeout(2000);
             if (await this.translationModal.isVisible()) {
                 await this.page.getByLabel('Close').click();
                 console.log('Translation popup closed successfully.');

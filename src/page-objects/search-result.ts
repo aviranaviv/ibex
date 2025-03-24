@@ -13,7 +13,11 @@ export default class SearchResult extends PageObjects {
      * @param {number} rated - The rating to search for.
      * @returns {Locator} The locator for the matching rating element.
      */
-    readonly getCardByRated = (rated: number): Locator => this.page.getByText(`${rated} out of 5`);
+    readonly getCardByRated = (rated: string): Locator => this.page.getByText(`${rated} out of 5`);
+    readonly nextPageButton = this.page.getByLabel('Search results pagination').getByLabel('Next', { exact: true });
+    readonly prePageButton = this.page.getByLabel('Search results pagination').getByLabel('Previous', {exact: true});
+    readonly getPageIndex = (index) => this.page.getByRole('link', { name: index.toString(), exact: true});
+    readonly activePage = this.page.locator('[aria-label="Search results pagination"] [aria-current="page"]');
 
     /**
      * Retrieves all ratings displayed on the search results page.
@@ -28,17 +32,60 @@ export default class SearchResult extends PageObjects {
         );
     }
 
+    async getActivePage(): Promise<number> {
+        return parseInt(await this.activePage.innerText());
+    }
+
+    async selectPageByIndex(pageIndex: number): Promise<void> {
+        let activePage: number = await this.getActivePage();
+
+        while(!(pageIndex === activePage)) {
+            if (await this.getPageIndex(pageIndex).isVisible()) {
+                await this.getPageIndex(pageIndex).click();
+                break;
+            }
+
+            if (activePage > pageIndex) {
+                await this.prePageButton.click();
+                activePage = await this.getActivePage();
+            }
+
+            if (activePage < pageIndex) {
+                await this.nextPageButton.click();
+                activePage = await this.getActivePage();
+            }
+        }
+
+        return console.log(`Page index ${pageIndex} is selected`);
+    }
+
     /**
      * Selects the listing with the highest rating and clicks on it.
      * @returns {Promise<void>} A promise that resolves when the action is completed.
      */
     async selectHighestRatedListing(): Promise<void> {
-        const ratings: string[] = await this.getRatingMap();
-        const highestRating: number = Math.max(...ratings.map(Number));
-        console.log(`Highest rated listing: ${highestRating}`);
+        let nextPageIsDisabled: boolean = await this.nextPageButton.isDisabled();
+        let actualHighestRating = 0;
+        let highestRatingPageIndex = 1;
 
-        const highestRatedCard = this.getCardByRated(highestRating).first();
+        while (!nextPageIsDisabled) {
+            const ratings: string[] = await this.getRatingMap();
+            const highestRating: number = Math.max(...ratings.map(Number));
+            if (actualHighestRating < highestRating) {
+                actualHighestRating = highestRating;
+                highestRatingPageIndex = parseInt(await this.activePage.innerText());
+            }
 
+            await this.nextPageButton.click();
+            await this.page.waitForLoadState('domcontentloaded');
+            nextPageIsDisabled = await this.nextPageButton.isDisabled();
+        }
+
+        console.log(`Highest rated listing: ${actualHighestRating.toFixed(1)} on page index ${highestRatingPageIndex}`);
+
+        await this.selectPageByIndex(highestRatingPageIndex);
+        await this.page.waitForTimeout(1000);
+        const highestRatedCard = this.getCardByRated(actualHighestRating.toFixed(1)).first();
         await highestRatedCard.scrollIntoViewIfNeeded();
         await highestRatedCard.waitFor({ state: 'visible' });
         await highestRatedCard.click({ force: true });
